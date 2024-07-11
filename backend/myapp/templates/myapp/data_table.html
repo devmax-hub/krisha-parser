@@ -1,0 +1,47 @@
+<!-- templates/myapp/data_table.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Table</title>
+</head>
+<body>
+    <h1>Крыша</h1>
+    <table border="1">
+        <tr>
+            <th>Url</th>
+            <th>Room</th>
+            <th>Square</th>
+            <th>CIty</th>
+            <th>Description</th>
+            <th>Price</th>
+        </tr>
+        {% for flat in flats %}
+        <tr>
+            <td>{{ flat.url }}</td>
+            <td>{{ flat.room }}</td>
+            <td>{{ flat.square }}</td>
+            <td>{{ flat.city }}</td>
+            <td>{{ flat.description }}</td>
+            <td><img src="{{ flat.photo }}" alt="Photo of {{ flat.address }}" style="width:100px; height:auto;"></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h1>Prices</h1>
+    <table border="1">
+        <tr>
+            <th>Flat</th>
+            <th>Date</th>
+            <th>Price</th>
+        </tr>
+        {% for price in prices %}
+        <tr>
+            <td>{{ price.flat.address }}</td>
+            <td>{{ price.date }}</td>
+            <td>{{ price.price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

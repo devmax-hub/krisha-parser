@@ -1,0 +1,74 @@
+version: "3.1"
+
+services:
+  db:
+    container_name: dj-postgres
+    image: postgres:14.0-alpine
+    environment:
+      - POSTGRES_PASSWORD=N6BDpzAwt7u
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=database
+#    ports:
+#      - 5432:5432
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    container_name: dj-backend
+    build: ./backend
+    command: python3 manage.py runserver 0.0.0.0:8000
+    #command: tail -f /dev/null
+    restart: always
+    environment:
+      - ENV_DEBUG=True
+      - POSTGRES_PASSWORD=N6BDpzAwt7u
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=database
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - BASE_URL=http://localhost
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+      - ./storage/static:/app/static
+      - ./storage/media:/app/media
+      - ./storage/upload:/app/upload
+    stdin_open: True
+    tty: True
+    depends_on:
+      - db
+
+
+  nginx:
+    image: nginx:stable
+    container_name: dj-nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/public:/var/www/html
+      - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - db
+      - backend
+
+    # pgAdmin web interface service
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dj-pgadmin4
+    restart: always
+    environment:
+       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+       PGADMIN_DEFAULT_PASSWORD: pgadmin4@gh@
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+volumes:
+    pgadmin_data:
+    postgres_data:
